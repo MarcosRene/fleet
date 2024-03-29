@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { AppProvider, UserProvider } from '@realm/react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider } from 'styled-components/native';
 import {
   useFonts,
@@ -30,11 +31,13 @@ export default function App() {
   return (
     <AppProvider id={REALM_APP_ID}>
       <ThemeProvider theme={theme}>
-        <StatusBar backgroundColor="transparent" style="light" translucent />
+        <SafeAreaProvider>
+          <StatusBar backgroundColor="transparent" style="light" translucent />
 
-        <UserProvider fallback={SignIn}>
-          <Routes />
-        </UserProvider>
+          <UserProvider fallback={SignIn}>
+            <Routes />
+          </UserProvider>
+        </SafeAreaProvider>
       </ThemeProvider>
     </AppProvider>
   );

@@ -2,9 +2,14 @@ import styled, { css } from 'styled-components/native';
 import { Image } from 'expo-image';
 import { Power } from 'phosphor-react-native';
 
-export const Container = styled.View`
+type ContainerStyleProps = {
+  paddingTop: number;
+};
+
+export const Container = styled.View<ContainerStyleProps>`
   width: 100%;
   padding: 32px;
+  padding-top: ${({ paddingTop }) => paddingTop + 32}px;
   background-color: ${({ theme }) => theme.COLORS.GRAY_700};
 
   flex-direction: row;
