@@ -3,11 +3,11 @@ import { useTheme } from 'styled-components/native';
 
 import { Container, Input, Label } from './styles';
 
-type LicensePlateInput = TextInputProps & {
+type TextAreaInput = TextInputProps & {
   label: string;
 };
 
-export function LicensePlateInput({ label, ...rest }: LicensePlateInput) {
+export function TextAreaInput({ label, ...rest }: TextAreaInput) {
   const { COLORS } = useTheme();
 
   return (
@@ -15,9 +15,9 @@ export function LicensePlateInput({ label, ...rest }: LicensePlateInput) {
       <Label>{label}</Label>
 
       <Input
-        maxLength={7}
-        autoCapitalize="characters"
         placeholderTextColor={COLORS.GRAY_400}
+        multiline
+        autoCapitalize="sentences"
         {...rest}
       />
     </Container>
