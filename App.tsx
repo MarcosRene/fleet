@@ -11,6 +11,7 @@ import {
 import { Loading } from './src/components/Loading';
 
 import { Routes } from './src/routes';
+import { RealmProvider } from './src/libs/realm';
 
 import { SignIn } from './src/screens/SignIn';
 
@@ -35,7 +36,9 @@ export default function App() {
           <StatusBar backgroundColor="transparent" style="light" translucent />
 
           <UserProvider fallback={SignIn}>
-            <Routes />
+            <RealmProvider>
+              <Routes />
+            </RealmProvider>
           </UserProvider>
         </SafeAreaProvider>
       </ThemeProvider>
