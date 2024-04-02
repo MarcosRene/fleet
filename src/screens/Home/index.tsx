@@ -1,14 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Alert, FlatList } from 'react-native';
-import { useUser } from '@realm/react';
+import { Realm, useUser } from '@realm/react';
 import { useNavigation } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+import { CloudArrowUp } from 'phosphor-react-native';
 
 import { CarStatus } from '../../components/CarStatus';
 import { HomeHeader } from '../../components/HomeHeader';
 import { HistoricCard, HistoricCardProps } from '../../components/HistoricCard';
+import { TopMessage } from '../../components/TopMessage';
 
 import { useQuery, useRealm } from '../../libs/realm';
 import { Historic } from '../../libs/realm/schemas/Historic';
+import {
+  getLastSyncTimestamp,
+  saveLastSyncTimestamp,
+} from '../../libs/asyncStorage/syncStorage';
 
 import { formateDate } from '../../utils/formatDate';
 
@@ -20,6 +27,8 @@ export function Home() {
   const realm = useRealm();
 
   const user = useUser();
+
+  const [percentageToSync, setPercentageToSync] = useState<string | null>(null);
 
   const [vehicleInUse, setVehicleInUse] = useState<Historic | null>(null);
   const [vehicleHistoric, setVehicleHistoric] = useState<HistoricCardProps[]>(
@@ -47,17 +56,19 @@ export function Home() {
     }
   }
 
-  function fetchHistoric() {
+  async function fetchHistoric() {
     try {
       const response = historic.filtered(
-        "status = 'arrival' SORT(created_at DESC)"
+        "status='arrival' SORT(created_at DESC)"
       );
+
+      const lastSync = await getLastSyncTimestamp();
 
       const formattedHistoricResponse = response.map((historic) => ({
         id: historic._id,
         licensePlate: historic.license_plate,
         created: formateDate(historic.created_at),
-        isSync: false,
+        isSync: lastSync > historic.updated_at!.getTime(),
       }));
 
       setVehicleHistoric(formattedHistoricResponse);
@@ -69,6 +80,28 @@ export function Home() {
 
   function handleHistoricDetails(id: string) {
     navigate('arrival', { id });
+  }
+
+  async function progressNotification(
+    transferred: number,
+    transferable: number
+  ) {
+    const percentage = (transferred / transferable) * 100;
+
+    if (percentage === 100) {
+      await saveLastSyncTimestamp();
+      await fetchHistoric();
+      setPercentageToSync(null);
+
+      Toast.show({
+        type: 'info',
+        text1: 'Todos os dados estão sincronizados',
+      });
+    }
+
+    if (percentage < 100) {
+      setPercentageToSync(`${percentage.toFixed(0)}% sincronizado.`);
+    }
   }
 
   useEffect(() => {
@@ -99,8 +132,26 @@ export function Home() {
     });
   }, [realm]);
 
+  useEffect(() => {
+    const syncSession = realm.syncSession;
+
+    if (!syncSession) return;
+
+    syncSession.addProgressNotification(
+      Realm.ProgressDirection.Upload,
+      Realm.ProgressMode.ReportIndefinitely,
+      progressNotification
+    );
+
+    return () => syncSession.removeProgressNotification(progressNotification);
+  }, []);
+
   return (
     <Container>
+      {percentageToSync && (
+        <TopMessage title={percentageToSync} icon={CloudArrowUp} />
+      )}
+
       <HomeHeader />
 
       <Content>

@@ -41,3 +41,13 @@ export const Footer = styled.View`
   flex-direction: row;
   gap: 16px;
 `;
+
+export const AsyncMessage = styled.Text`
+  margin: 32px;
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
+  color: ${({ theme }) => theme.COLORS.GRAY_300};
+  text-align: center;
+
+  flex: 1;
+`;

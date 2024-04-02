@@ -6,7 +6,7 @@ import { IconBoxProps } from '../ButtonIcon';
 import { Container, Title } from './styles';
 
 type TopMessageProps = {
-  icon: IconBoxProps;
+  icon?: IconBoxProps;
   title: string;
 };
 

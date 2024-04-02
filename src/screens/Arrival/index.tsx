@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { X } from 'phosphor-react-native';
 import { BSON } from 'realm';
@@ -8,8 +9,10 @@ import { Header } from '../../components/Header';
 
 import { useObject, useRealm } from '../../libs/realm';
 import { Historic } from '../../libs/realm/schemas/Historic';
+import { getLastSyncTimestamp } from '../../libs/asyncStorage/syncStorage';
 
 import {
+  AsyncMessage,
   Container,
   Content,
   Description,
@@ -37,7 +40,11 @@ export function Arrival() {
   const historic = useObject(Historic, toUUID(new BSON.UUID(id)));
   const realm = useRealm();
 
+  const [dataNotSynced, setDataNotSynced] = useState(false);
+
   const departureStatusType = historic?.status === 'departure';
+
+  const asyncMessageText = departureStatusType ? 'partida' : 'chegada';
 
   function handleRemoveVehicleUsage() {
     Alert.alert('Cancelar', 'Cancelar a utilização do veículo?', [
@@ -84,6 +91,12 @@ export function Arrival() {
     }
   }
 
+  useEffect(() => {
+    getLastSyncTimestamp().then((lastSync) =>
+      setDataNotSynced(historic!.updated_at.getTime() > lastSync)
+    );
+  }, []);
+
   return (
     <Container>
       <Header title={departureStatusType ? 'Chegada' : 'Detalhes'} />
@@ -104,6 +117,12 @@ export function Arrival() {
 
           <Button title="Registrar Chegada" onPress={handleArrivalRegister} />
         </Footer>
+      )}
+
+      {dataNotSynced && (
+        <AsyncMessage>
+          Sincronização da {asyncMessageText} pendente.
+        </AsyncMessage>
       )}
     </Container>
   );
