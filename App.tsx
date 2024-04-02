@@ -3,6 +3,7 @@ import 'react-native-get-random-values';
 import { StatusBar } from 'expo-status-bar';
 import { AppProvider, UserProvider } from '@realm/react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useNetInfo } from '@react-native-community/netinfo';
 import { ThemeProvider } from 'styled-components/native';
 import {
   useFonts,
@@ -24,6 +25,8 @@ import theme from './src/theme';
 import { REALM_APP_ID } from '@env';
 
 export default function App() {
+  const netInfo = useNetInfo();
+
   const [isFontsLoaded] = useFonts({
     Roboto_400Regular,
     Roboto_700Bold,
@@ -41,7 +44,9 @@ export default function App() {
         >
           <StatusBar backgroundColor="transparent" style="light" translucent />
 
-          <TopMessage icon={WifiSlash} title="Você está off-line." />
+          {!netInfo.isConnected && (
+            <TopMessage icon={WifiSlash} title="Você está off-line." />
+          )}
 
           <UserProvider fallback={SignIn}>
             <RealmProvider sync={syncConfig} fallback={Loading}>
