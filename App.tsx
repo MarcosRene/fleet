@@ -9,8 +9,10 @@ import {
   Roboto_400Regular,
   Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
+import { WifiSlash } from 'phosphor-react-native';
 
 import { Loading } from './src/components/Loading';
+import { TopMessage } from './src/components/TopMessage';
 
 import { Routes } from './src/routes';
 import { RealmProvider, syncConfig } from './src/libs/realm';
@@ -38,6 +40,8 @@ export default function App() {
           style={{ flex: 1, backgroundColor: theme.COLORS.GRAY_800 }}
         >
           <StatusBar backgroundColor="transparent" style="light" translucent />
+
+          <TopMessage icon={WifiSlash} title="Você está off-line." />
 
           <UserProvider fallback={SignIn}>
             <RealmProvider sync={syncConfig} fallback={Loading}>

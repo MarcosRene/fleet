@@ -13,7 +13,6 @@ export const Container = styled.View<ContainerStyleProps>`
 
   flex-direction: row;
   justify-content: space-between;
-  z-index: 1;
 `;
 
 export const Title = styled.Text`
