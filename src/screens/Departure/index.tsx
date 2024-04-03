@@ -9,6 +9,7 @@ import {
   useForegroundPermissions,
   watchPositionAsync,
 } from 'expo-location';
+import { Car } from 'phosphor-react-native';
 
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
@@ -143,6 +144,7 @@ export function Departure() {
           <Content>
             {!!currentAddress && (
               <LocationInfo
+                icon={Car}
                 label="Localização atual"
                 description={currentAddress}
               />

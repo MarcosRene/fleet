@@ -1,3 +1,4 @@
+import { IconBox, IconBoxElementProps } from '../IconBox';
 import { Container, Description, Info, Label } from './styles';
 
 export type LocationInfo = {
@@ -5,9 +6,15 @@ export type LocationInfo = {
   description: string;
 };
 
-export function LocationInfo({ label, description }: LocationInfo) {
+export function LocationInfo({
+  label,
+  description,
+  icon,
+}: LocationInfo & { icon: IconBoxElementProps }) {
   return (
     <Container>
+      <IconBox icon={icon} />
+
       <Info>
         <Label numberOfLines={1}>{label}</Label>
 
