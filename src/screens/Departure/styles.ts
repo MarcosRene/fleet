@@ -12,3 +12,13 @@ export const Content = styled.View`
   flex: 1;
   gap: 16px;
 `;
+
+export const Message = styled.Text`
+  margin: 24px;
+
+  font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
+  font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
+  color: ${({ theme }) => theme.COLORS.WHITE};
+
+  text-align: center;
+`;

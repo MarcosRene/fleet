@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TextInput, ScrollView, Alert } from 'react-native';
 import { useUser } from '@realm/react';
 import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useForegroundPermissions } from 'expo-location';
 
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
@@ -14,10 +15,12 @@ import { Historic } from '@/libs/realm/schemas/Historic';
 
 import { licensePlateValidate } from '@/utils/licensePlateValidate';
 
-import { Container, Content } from './styles';
+import { Container, Content, Message } from './styles';
 
 export function Departure() {
   const { goBack } = useNavigation();
+  const realm = useRealm();
+  const user = useUser();
 
   const licensePlateInputRef = useRef<TextInput>(null);
   const textAreaInputRef = useRef<TextInput>(null);
@@ -26,8 +29,8 @@ export function Departure() {
   const [description, setDescription] = useState('');
   const [isRegistring, setIsRegistring] = useState(false);
 
-  const realm = useRealm();
-  const user = useUser();
+  const [locationForegroundPermission, requesLocationForegroundPermission] =
+    useForegroundPermissions();
 
   function handleDepartureRegister() {
     try {
@@ -71,6 +74,24 @@ export function Departure() {
     } finally {
       setIsRegistring(false);
     }
+  }
+
+  useEffect(() => {
+    requesLocationForegroundPermission();
+  }, []);
+
+  if (!locationForegroundPermission?.granted) {
+    return (
+      <Container>
+        <Header title="Saída" />
+
+        <Message>
+          Você precisa permitir que o aplicativo tenha acesso a localização para
+          utilizar essa funcionalidae. Por favor, acesse as configurações do seu
+          dispositivo para conceder essa permissão ao aplicativo.
+        </Message>
+      </Container>
+    );
   }
 
   return (
