@@ -3,15 +3,23 @@ import { TextInput, ScrollView, Alert } from 'react-native';
 import { useUser } from '@realm/react';
 import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useForegroundPermissions } from 'expo-location';
+import {
+  LocationAccuracy,
+  LocationSubscription,
+  useForegroundPermissions,
+  watchPositionAsync,
+} from 'expo-location';
 
 import { Button } from '@/components/Button';
 import { Header } from '@/components/Header';
 import { LicensePlateInput } from '@/components/LicensePlateInput';
+import { Loading } from '@/components/Loading';
+import { LocationInfo } from '@/components/LocationInfo';
 import { TextAreaInput } from '@/components/TextAreaInput';
 
 import { useRealm } from '@/libs/realm';
 import { Historic } from '@/libs/realm/schemas/Historic';
+import { getAddressLocation } from '@/utils/getAddressLocation';
 
 import { licensePlateValidate } from '@/utils/licensePlateValidate';
 
@@ -27,7 +35,9 @@ export function Departure() {
 
   const [licensePlace, setLicensePlace] = useState('');
   const [description, setDescription] = useState('');
+  const [currentAddress, setCurrentAddress] = useState<string | null>(null);
   const [isRegistring, setIsRegistring] = useState(false);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(true);
 
   const [locationForegroundPermission, requesLocationForegroundPermission] =
     useForegroundPermissions();
@@ -80,6 +90,32 @@ export function Departure() {
     requesLocationForegroundPermission();
   }, []);
 
+  useEffect(() => {
+    if (!locationForegroundPermission?.granted) return;
+
+    let subscription: LocationSubscription;
+
+    watchPositionAsync(
+      {
+        accuracy: LocationAccuracy.High,
+        timeInterval: 1000,
+      },
+      ({ coords }) => {
+        getAddressLocation(coords).then((addressResponse) => {
+          if (addressResponse) {
+            setCurrentAddress(addressResponse);
+          }
+        });
+      }
+    )
+      .then((response) => (subscription = response))
+      .finally(() => {
+        setIsLoadingLocation(false);
+      });
+
+    return () => subscription?.remove();
+  }, [locationForegroundPermission]);
+
   if (!locationForegroundPermission?.granted) {
     return (
       <Container>
@@ -94,6 +130,10 @@ export function Departure() {
     );
   }
 
+  if (isLoadingLocation) {
+    return <Loading />;
+  }
+
   return (
     <Container>
       <Header title="Saída" />
@@ -101,6 +141,13 @@ export function Departure() {
       <KeyboardAwareScrollView extraHeight={100}>
         <ScrollView>
           <Content>
+            {!!currentAddress && (
+              <LocationInfo
+                label="Localização atual"
+                description={currentAddress}
+              />
+            )}
+
             <LicensePlateInput
               ref={licensePlateInputRef}
               label="Placa do veículo"
