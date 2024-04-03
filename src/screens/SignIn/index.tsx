@@ -3,9 +3,9 @@ import { Alert } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Realm, useApp } from '@realm/react';
 
-import { Button } from '../../components/Button';
+import { Button } from '@/components/Button';
 
-import backgroundImg from '../../assets/background.png';
+import backgroundImg from '@/assets/background.png';
 
 import { Container, Slogan, Title } from './styles';
 
@@ -26,6 +26,8 @@ export function SignIn() {
       setIsAuthenticating(true);
 
       const { idToken } = await GoogleSignin.signIn();
+
+      console.log('idToken', idToken);
 
       if (!idToken) {
         return Alert.alert(

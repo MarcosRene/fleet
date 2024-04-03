@@ -5,19 +5,19 @@ import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { CloudArrowUp } from 'phosphor-react-native';
 
-import { CarStatus } from '../../components/CarStatus';
-import { HomeHeader } from '../../components/HomeHeader';
-import { HistoricCard, HistoricCardProps } from '../../components/HistoricCard';
-import { TopMessage } from '../../components/TopMessage';
+import { CarStatus } from '@/components/CarStatus';
+import { HomeHeader } from '@/components/HomeHeader';
+import { HistoricCard, HistoricCardProps } from '@/components/HistoricCard';
+import { TopMessage } from '@/components/TopMessage';
 
-import { useQuery, useRealm } from '../../libs/realm';
-import { Historic } from '../../libs/realm/schemas/Historic';
+import { useQuery, useRealm } from '@/libs/realm';
+import { Historic } from '@/libs/realm/schemas/Historic';
 import {
-  getLastSyncTimestamp,
+  getLastAsyncTimestamp,
   saveLastSyncTimestamp,
-} from '../../libs/asyncStorage/syncStorage';
+} from '@/libs/asyncStorage/syncStorage';
 
-import { formateDate } from '../../utils/formatDate';
+import { formateDate } from '@/utils/formatDate';
 
 import { Container, Content, LabelEmpty, Title } from './styles';
 
@@ -62,7 +62,7 @@ export function Home() {
         "status='arrival' SORT(created_at DESC)"
       );
 
-      const lastSync = await getLastSyncTimestamp();
+      const lastSync = await getLastAsyncTimestamp();
 
       const formattedHistoricResponse = response.map((historic) => ({
         id: historic._id,

@@ -10,7 +10,7 @@ export async function saveLastSyncTimestamp() {
   return timestamp;
 }
 
-export async function getLastSyncTimestamp() {
+export async function getLastAsyncTimestamp() {
   const response = await AsyncStorage.getItem(STORAGE_ASYNC_KEY);
 
   return Number(response);

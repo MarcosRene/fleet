@@ -4,15 +4,15 @@ import { useUser } from '@realm/react';
 import { useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import { Button } from '../../components/Button';
-import { Header } from '../../components/Header';
-import { LicensePlateInput } from '../../components/LicensePlateInput';
-import { TextAreaInput } from '../../components/TextAreaInput';
+import { Button } from '@/components/Button';
+import { Header } from '@/components/Header';
+import { LicensePlateInput } from '@/components/LicensePlateInput';
+import { TextAreaInput } from '@/components/TextAreaInput';
 
-import { useRealm } from '../../libs/realm';
-import { Historic } from '../../libs/realm/schemas/Historic';
+import { useRealm } from '@/libs/realm';
+import { Historic } from '@/libs/realm/schemas/Historic';
 
-import { licensePlateValidate } from '../../utils/licensePlateValidate';
+import { licensePlateValidate } from '@/utils/licensePlateValidate';
 
 import { Container, Content } from './styles';
 
