@@ -21,7 +21,7 @@ TaskManager.defineTask(
         throw error;
       }
 
-      const { coords, timestamp } = data.localtion[0];
+      const { coords, timestamp } = data.locations[0];
 
       const currentLocation = {
         latitude: coords.latitude,
@@ -43,7 +43,7 @@ export async function startLocationTask() {
     );
 
     if (hashStarted) {
-      await stopLocationUpdatesAsync(BACKGROUND_TASK_NAME);
+      await stopLocationTask();
     }
 
     await startLocationUpdatesAsync(BACKGROUND_TASK_NAME, {

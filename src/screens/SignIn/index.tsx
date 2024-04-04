@@ -27,18 +27,15 @@ export function SignIn() {
 
       const { idToken } = await GoogleSignin.signIn();
 
-      console.log('idToken', idToken);
-
-      if (!idToken) {
+      if (idToken) {
+        const credentials = Realm.Credentials.jwt(idToken);
+        await app.logIn(credentials);
+      } else {
         return Alert.alert(
           'Entrar',
           'Não foi possível conecta-se a sua conta google.'
         );
       }
-
-      const credentials = Realm.Credentials.jwt(idToken);
-
-      await app.logIn(credentials);
     } catch (error) {
       console.error(error);
     } finally {

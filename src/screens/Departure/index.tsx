@@ -23,8 +23,10 @@ import { TextAreaInput } from '@/components/TextAreaInput';
 
 import { useRealm } from '@/libs/realm';
 import { Historic } from '@/libs/realm/schemas/Historic';
-import { getAddressLocation } from '@/utils/getAddressLocation';
 
+import { startLocationTask } from '@/tasks/backgroundLocationTask';
+
+import { getAddressLocation } from '@/utils/getAddressLocation';
 import { licensePlateValidate } from '@/utils/licensePlateValidate';
 
 import { Container, Content, Message } from './styles';
@@ -75,9 +77,9 @@ export function Departure() {
 
       setIsRegistring(true);
 
-      const backgroundPermission = await requestBackgroundPermissionsAsync();
+      const backgroundPermissions = await requestBackgroundPermissionsAsync();
 
-      if (!backgroundPermission.granted) {
+      if (!backgroundPermissions.granted) {
         setIsRegistring(false);
 
         return Alert.alert(
@@ -85,6 +87,8 @@ export function Departure() {
           'É necessário permitir que o App tenha acesso a localização em segundo plano. Acesse as configurações do dispositivo e habilite "Permitir o tempo todo".'
         );
       }
+
+      await startLocationTask();
 
       realm.write(() => {
         realm.create(
