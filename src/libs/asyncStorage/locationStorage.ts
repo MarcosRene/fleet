@@ -8,16 +8,16 @@ type LocationProps = {
   timestamp: number;
 };
 
-export async function getStorageLocation() {
+export async function getStorageLocations() {
   const storage = await AsyncStorage.getItem(STORAGE_KEY);
 
-  if (storage) {
-    return JSON.parse(storage) ?? [];
-  }
+  const response = storage ? JSON.parse(storage) : [];
+
+  return response;
 }
 
 export async function saveStorageLocation(newLocation: LocationProps) {
-  const storage = await getStorageLocation();
+  const storage = await getStorageLocations();
 
   storage.push(newLocation);
 

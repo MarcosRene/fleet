@@ -6,21 +6,20 @@ import {
 } from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 
+import {
+  removeStorageLocations,
+  saveStorageLocation,
+} from '../libs/asyncStorage/locationStorage';
+
 export const BACKGROUND_TASK_NAME = 'location-tracking';
 
-type TaskManagerProps = {
-  data: any;
-  error: any;
-};
+TaskManager.defineTask(BACKGROUND_TASK_NAME, async ({ data, error }: any) => {
+  try {
+    if (error) {
+      throw error;
+    }
 
-TaskManager.defineTask(
-  BACKGROUND_TASK_NAME,
-  ({ data, error }: TaskManagerProps) => {
-    try {
-      if (error) {
-        throw error;
-      }
-
+    if (data) {
       const { coords, timestamp } = data.locations[0];
 
       const currentLocation = {
@@ -29,20 +28,21 @@ TaskManager.defineTask(
         timestamp,
       };
 
-      console.log(currentLocation);
-    } catch (error) {
-      console.error(error);
+      await saveStorageLocation(currentLocation);
     }
+  } catch (error) {
+    console.error(error);
+    stopLocationTask();
   }
-);
+});
 
 export async function startLocationTask() {
   try {
-    const hashStarted = await hasStartedLocationUpdatesAsync(
+    const hasStarted = await hasStartedLocationUpdatesAsync(
       BACKGROUND_TASK_NAME
     );
 
-    if (hashStarted) {
+    if (hasStarted) {
       await stopLocationTask();
     }
 
@@ -58,14 +58,15 @@ export async function startLocationTask() {
 
 export async function stopLocationTask() {
   try {
-    const hashStarted = await hasStartedLocationUpdatesAsync(
+    const hasStarted = await hasStartedLocationUpdatesAsync(
       BACKGROUND_TASK_NAME
     );
 
-    if (hashStarted) {
+    if (hasStarted) {
       await stopLocationUpdatesAsync(BACKGROUND_TASK_NAME);
+      await removeStorageLocations();
     }
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }

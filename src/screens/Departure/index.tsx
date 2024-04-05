@@ -42,12 +42,12 @@ export function Departure() {
   const [licensePlace, setLicensePlace] = useState('');
   const [description, setDescription] = useState('');
   const [currentAddress, setCurrentAddress] = useState<string | null>(null);
-  const [currentCoords, setCurretnCoords] =
+  const [currentCoords, setCurrentCoords] =
     useState<LocationObjectCoords | null>(null);
   const [isRegistring, setIsRegistring] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(true);
 
-  const [locationForegroundPermission, requesLocationForegroundPermission] =
+  const [locationForegroundPermission, requestLocationForegroundPermission] =
     useForegroundPermissions();
 
   async function handleDepartureRegister() {
@@ -115,11 +115,13 @@ export function Departure() {
   }
 
   useEffect(() => {
-    requesLocationForegroundPermission();
+    requestLocationForegroundPermission();
   }, []);
 
   useEffect(() => {
-    if (!locationForegroundPermission?.granted) return;
+    if (!locationForegroundPermission?.granted) {
+      return;
+    }
 
     let subscription: LocationSubscription;
 
@@ -128,21 +130,24 @@ export function Departure() {
         accuracy: LocationAccuracy.High,
         timeInterval: 1000,
       },
-      ({ coords }) => {
-        setCurretnCoords(coords);
-        getAddressLocation(coords).then((addressResponse) => {
-          if (addressResponse) {
-            setCurrentAddress(addressResponse);
-          }
-        });
-      }
-    )
-      .then((response) => (subscription = response))
-      .finally(() => {
-        setIsLoadingLocation(false);
-      });
+      (location) => {
+        setCurrentCoords(location.coords);
 
-    return () => subscription?.remove();
+        getAddressLocation(location.coords)
+          .then((address) => {
+            if (address) {
+              setCurrentAddress(address);
+            }
+          })
+          .finally(() => setIsLoadingLocation(false));
+      }
+    ).then((response) => (subscription = response));
+
+    return () => {
+      if (subscription) {
+        subscription.remove();
+      }
+    };
   }, [locationForegroundPermission]);
 
   if (!locationForegroundPermission?.granted) {
