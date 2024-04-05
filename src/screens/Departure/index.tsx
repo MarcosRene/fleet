@@ -28,8 +28,9 @@ import { startLocationTask } from '@/tasks/backgroundLocationTask';
 
 import { getAddressLocation } from '@/utils/getAddressLocation';
 import { licensePlateValidate } from '@/utils/licensePlateValidate';
+import { openSettings } from '@/utils/openSettings';
 
-import { Container, Content, Message } from './styles';
+import { Container, Content, Message, MessageContent } from './styles';
 
 export function Departure() {
   const { goBack } = useNavigation();
@@ -84,7 +85,8 @@ export function Departure() {
 
         return Alert.alert(
           'Localização',
-          'É necessário permitir que o App tenha acesso a localização em segundo plano. Acesse as configurações do dispositivo e habilite "Permitir o tempo todo".'
+          'É necessário permitir que o App tenha acesso a localização em segundo plano. Acesse as configurações do dispositivo e habilite "Permitir o tempo todo".',
+          [{ text: 'Abrir configurações', onPress: openSettings }]
         );
       }
 
@@ -126,9 +128,7 @@ export function Departure() {
   }, []);
 
   useEffect(() => {
-    if (!locationForegroundPermission?.granted) {
-      return;
-    }
+    if (!locationForegroundPermission?.granted) return;
 
     let subscription: LocationSubscription;
 
@@ -162,11 +162,15 @@ export function Departure() {
       <Container>
         <Header title="Saída" />
 
-        <Message>
-          Você precisa permitir que o aplicativo tenha acesso a localização para
-          utilizar essa funcionalidae. Por favor, acesse as configurações do seu
-          dispositivo para conceder essa permissão ao aplicativo.
-        </Message>
+        <MessageContent>
+          <Message>
+            Você precisa permitir que o aplicativo tenha acesso a localização
+            para utilizar essa funcionalidae. Por favor, acesse as configurações
+            do seu dispositivo para conceder essa permissão ao aplicativo.
+          </Message>
+
+          <Button title="Abrir configurações" onPress={openSettings} />
+        </MessageContent>
       </Container>
     );
   }

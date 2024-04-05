@@ -14,11 +14,17 @@ export const Content = styled.View`
 `;
 
 export const Message = styled.Text`
-  margin: 24px;
-
+  margin-bottom: 44px;
   font-family: ${({ theme }) => theme.FONT_FAMILY.REGULAR};
   font-size: ${({ theme }) => theme.FONT_SIZE.SM}px;
   color: ${({ theme }) => theme.COLORS.WHITE};
 
   text-align: center;
+`;
+
+export const MessageContent = styled.View`
+  flex: 1;
+  padding: 24px;
+
+  justify-content: center;
 `;
