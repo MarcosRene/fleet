@@ -16,4 +16,4 @@ export const syncConfig: any = {
 };
 
 export const { RealmProvider, useRealm, useQuery, useObject } =
-  createRealmContext({ schema: [Historic, Coords], schemaVersion: 1 });
+  createRealmContext({ schema: [Historic, Coords] });
