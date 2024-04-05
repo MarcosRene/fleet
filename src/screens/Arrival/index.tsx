@@ -111,7 +111,6 @@ export function Arrival() {
     setDataNotSynced(updatedAt > lastSync);
 
     const locationStorage = await getStorageLocations();
-    console.log('locationStorage =>', locationStorage);
     setCoordinates(locationStorage);
   }
 
