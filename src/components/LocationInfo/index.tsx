@@ -1,7 +1,7 @@
 import { IconBox, IconBoxElementProps } from '../IconBox';
 import { Container, Description, Info, Label } from './styles';
 
-export type LocationInfo = {
+export type LocationInfoProps = {
   label: string;
   description: string;
 };
@@ -10,7 +10,7 @@ export function LocationInfo({
   label,
   description,
   icon,
-}: LocationInfo & { icon: IconBoxElementProps }) {
+}: LocationInfoProps & { icon: IconBoxElementProps }) {
   return (
     <Container>
       <IconBox icon={icon} />

@@ -6,10 +6,10 @@ import { Container, Line } from './styles';
 
 type LocationsProps = {
   departure: LocationInfoProps;
-  arrival: LocationInfoProps;
+  arrival?: LocationInfoProps | null;
 };
 
-export function Locations({ departure, arrival }: LocationsProps) {
+export function Locations({ departure, arrival = null }: LocationsProps) {
   return (
     <Container>
       <LocationInfo
@@ -18,13 +18,17 @@ export function Locations({ departure, arrival }: LocationsProps) {
         description={departure.description}
       />
 
-      <Line />
+      {arrival && (
+        <>
+          <Line />
 
-      <LocationInfo
-        icon={FlagCheckered}
-        label={arrival.label}
-        description={arrival.description}
-      />
+          <LocationInfo
+            icon={FlagCheckered}
+            label={arrival.label}
+            description={arrival.description}
+          />
+        </>
+      )}
     </Container>
   );
 }

@@ -8,6 +8,9 @@ import { LatLng } from 'react-native-maps';
 import { Button } from '@/components/Button';
 import { ButtonIcon } from '@/components/ButtonIcon';
 import { Header } from '@/components/Header';
+import { Loading } from '@/components/Loading';
+import { Locations } from '@/components/Locations';
+import { LocationInfoProps } from '@/components/LocationInfo';
 import { Map } from '@/components/Map';
 
 import { useObject, useRealm } from '@/libs/realm';
@@ -16,6 +19,8 @@ import { getLastAsyncTimestamp } from '@/libs/asyncStorage/syncStorage';
 import { getStorageLocations } from '@/libs/asyncStorage/locationStorage';
 
 import { stopLocationTask } from '@/tasks/backgroundLocationTask';
+
+import { getAddressLocation } from '@/utils/getAddressLocation';
 
 import {
   AsyncMessage,
@@ -45,8 +50,13 @@ export function Arrival() {
   const historic = useObject(Historic, toUUID(new BSON.UUID(id)));
   const realm = useRealm();
 
-  const [dataNotSynced, setDataNotSynced] = useState(false);
   const [coordinates, setCoordinates] = useState<LatLng[]>([]);
+  const [departure, setDeparture] = useState<LocationInfoProps>(
+    {} as LocationInfoProps
+  );
+  const [arrival, setArrival] = useState<LocationInfoProps | null>(null);
+  const [dataNotSynced, setDataNotSynced] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const departureStatusType = historic?.status === 'departure';
 
@@ -105,21 +115,64 @@ export function Arrival() {
   }
 
   async function getLocationsInfo() {
-    if (!historic) {
-      return;
-    }
+    if (!historic) return;
 
     const lastSync = await getLastAsyncTimestamp();
     const updatedAt = historic!.updated_at.getTime();
     setDataNotSynced(updatedAt > lastSync);
 
-    const locationStorage = await getStorageLocations();
-    setCoordinates(locationStorage);
+    if (historic?.status === 'departure') {
+      const locationsStorage = await getStorageLocations();
+      setCoordinates(locationsStorage);
+    } else {
+      setCoordinates(historic?.coords ?? []);
+    }
+
+    if (historic?.coords[0]) {
+      const departureStreetName = await getAddressLocation(historic.coords[0]);
+
+      setDeparture({
+        label: `Saíndo em ${departureStreetName ?? ''}`,
+        description: new Intl.DateTimeFormat('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+          .format(new Date(historic.coords[0].timestamp))
+          .replace(',', ' às'),
+      });
+    }
+
+    if (historic?.status === 'arrival') {
+      const lastLocation = historic.coords[historic.coords.length - 1];
+      const ArrivalStreetName = await getAddressLocation(lastLocation);
+
+      setArrival({
+        label: `Chegando em ${ArrivalStreetName ?? ''}`,
+        description: new Intl.DateTimeFormat('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+          .format(new Date(lastLocation.timestamp))
+          .replace(',', ' às'),
+      });
+    }
+
+    setIsLoading(false);
   }
 
   useEffect(() => {
     getLocationsInfo();
   }, [historic]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <Container>
@@ -128,6 +181,8 @@ export function Arrival() {
       {coordinates.length > 0 && <Map coordinates={coordinates} />}
 
       <Content>
+        <Locations departure={departure} arrival={arrival} />
+
         <Label>Placa do veículo</Label>
 
         <LicensePlate>{historic?.license_plate}</LicensePlate>
